@@ -1,0 +1,105 @@
+{
+  "pages": [
+    "Command Center",
+    "Live Grid",
+    "Renewable Assets",
+    "Battery Management",
+    "AI Decisions",
+    "Scenario Simulator",
+    "Forecasting",
+    "Optimization",
+    "Decision History",
+    "Analytics",
+    "Alerts",
+    "Settings"
+  ],
+  "observations": [
+    {
+      "page": "Command Center",
+      "heading": "Command Center",
+      "buttons": [
+        "Run Agentic Optimization"
+      ]
+    },
+    {
+      "page": "Live Grid",
+      "heading": "Live Grid",
+      "buttons": []
+    },
+    {
+      "page": "Renewable Assets",
+      "heading": "Renewable Assets",
+      "buttons": [
+        "Details",
+        "Details",
+        "Details"
+      ]
+    },
+    {
+      "page": "Battery Management",
+      "heading": "Battery Management",
+      "buttons": []
+    },
+    {
+      "page": "AI Decisions",
+      "heading": "AI Decisions",
+      "buttons": []
+    },
+    {
+      "page": "Scenario Simulator",
+      "heading": "Scenario Simulator",
+      "buttons": [
+        "Solar Drop -40%Simulate sudden cloud cover across main solar assets.",
+        "Wind Spike +30%Simulate unexpected high wind speeds boosting capacity.",
+        "Price Spike +100%Simulate grid stress driving up wholesale electricity costs.",
+        "Demand Spike +25%Simulate rapid industrial demand increase requiring peaking assets.",
+        "Battery B1 FailureSimulate unexpected unavailability of main battery storage.",
+        "Transmission LimitSimulate bottleneck forcing local load balancing.",
+        "Storm WarningSimulate incoming storm requiring resilience measures.",
+        "Forecast DeviationSimulate sudden drop in expected renewables.",
+        "Industrial Load SpikeSimulate large unforecasted factory load."
+      ]
+    },
+    {
+      "page": "Forecasting",
+      "heading": "Forecasting",
+      "buttons": []
+    },
+    {
+      "page": "Optimization",
+      "heading": "Optimization",
+      "buttons": []
+    },
+    {
+      "page": "Decision History",
+      "heading": "Decision History",
+      "buttons": []
+    },
+    {
+      "page": "Analytics",
+      "heading": "Analytics",
+      "buttons": []
+    },
+    {
+      "page": "Alerts",
+      "heading": "Alerts",
+      "buttons": []
+    },
+    {
+      "page": "Settings",
+      "heading": "Settings",
+      "buttons": []
+    }
+  ],
+  "errors": [
+    "Error fetching state: AxiosError: Network Error\n    at XMLHttpRequest.handleError (http://127.0.0.1:5173/node_modules/.vite/deps/axios.js?v=98171d86:2365:19)",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Error fetching state: AxiosError: Network Error\n    at XMLHttpRequest.handleError (http://127.0.0.1:5173/node_modules/.vite/deps/axios.js?v=98171d86:2365:19)",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile": {
+    "viewport": 390,
+    "content": 102,
+    "scroll": 390
+  }
+}

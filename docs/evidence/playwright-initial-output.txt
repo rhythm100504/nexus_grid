@@ -1,0 +1,124 @@
+
+Running 16 tests using 1 worker
+
+(node:21623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/energy.spec.cjs:19:3 › all 12 pages responsive at 1920px (5.8s)
+  ✓   2 tests/energy.spec.cjs:19:3 › all 12 pages responsive at 1440px (6.7s)
+  ✓   3 tests/energy.spec.cjs:19:3 › all 12 pages responsive at 1024px (6.0s)
+  ✓   4 tests/energy.spec.cjs:19:3 › all 12 pages responsive at 768px (7.1s)
+  ✓   5 tests/energy.spec.cjs:19:3 › all 12 pages responsive at 390px (6.4s)
+  ✓   6 tests/energy.spec.cjs:19:3 › all 12 pages responsive at 320px (5.0s)
+  ✓   7 tests/energy.spec.cjs:34:1 › every page passes axe WCAG A/AA checks (5.1s)
+  ✓   8 tests/energy.spec.cjs:41:1 › real API values render on dashboard, assets, batteries, grid, forecasts and analytics (1.5s)
+  ✘   9 tests/energy.spec.cjs:53:1 › orchestrator POST, loading state, real decision and optimization remain connected (1.2s)
+(node:21698) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 tests/energy.spec.cjs:65:1 › all nine existing scenario controls invoke real backend and update dashboard and audit (3.1s)
+  ✘  11 tests/energy.spec.cjs:78:1 › 15-second polling continues across navigation and refresh (15.9s)
+(node:21730) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  12 tests/energy.spec.cjs:82:1 › mobile drawer keyboard escape, focus trap, navigation and reduced motion (979ms)
+(node:21744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 tests/energy.spec.cjs:90:1 › offline state and failed execution show errors without fabricated success (801ms)
+  ✓  14 tests/energy.spec.cjs:94:1 › stale state retains values and labels lost connection (16.8s)
+  ✓  15 tests/energy.spec.cjs:98:1 › read-only resources handle HTTP errors and empty responses explicitly (2.0s)
+  ✓  16 tests/energy.spec.cjs:103:1 › slow real requests display loading skeletons without false values (1.2s)
+
+
+  1) tests/energy.spec.cjs:53:1 › orchestrator POST, loading state, real decision and optimization remain connected 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('decision-output')
+    Expected substring: "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)"
+    Error: strict mode violation: getByTestId('decision-output') resolved to 11 elements:
+        1) <div class="decision-output" data-testid="decision-output">…</div> aka locator('section').filter({ hasText: 'Agent responseCurrent' }).getByTestId('decision-output')
+        2) <div class="decision-output" data-testid="decision-output">…</div> aka getByRole('article').filter({ hasText: 'Injected: Industrial demand' }).getByTestId('decision-output')
+        3) <div class="decision-output" data-testid="decision-output">…</div> aka getByRole('article').filter({ hasText: 'Injected: Weather forecast' }).getByTestId('decision-output')
+        4) <div class="decision-output" data-testid="decision-output">…</div> aka getByRole('article').filter({ hasText: 'Injected: Storm warning#' }).getByTestId('decision-output')
+        5) <div class="decision-output" data-testid="decision-output">…</div> aka getByRole('article').filter({ hasText: 'Injected: Transmission' }).getByTestId('decision-output')
+        6) <div class="decision-output" data-testid="decision-output">…</div> aka getByRole('article').filter({ hasText: 'Injected: Battery B1' }).getByTestId('decision-output')
+        7) <div class="decision-output" data-testid="decision-output">…</div> aka locator('article:nth-child(6) > .timeline-content > details > .decision-output')
+        8) <div class="decision-output" data-testid="decision-output">…</div> aka locator('article:nth-child(7) > .timeline-content > details > .decision-output')
+        9) <div class="decision-output" data-testid="decision-output">…</div> aka locator('article:nth-child(8) > .timeline-content > details > .decision-output')
+        10) <div class="decision-output" data-testid="decision-output">…</div> aka locator('article:nth-child(9) > .timeline-content > details > .decision-output')
+        ...
+
+    Call log:
+      - Expect "toContainText" getByTestId('decision-output') with timeout 15000ms
+      - waiting for getByTestId('decision-output')
+
+
+      58 |   const res=await response;expect(res.request().method()).toBe('POST');expect(res.request().postData()).toBeNull();const body=await res.json();expect(res.status()).toBe(200);
+      59 |   await expect(page.getByTestId('decision-output')).toContainText(body.explanation);await expect(page.getByTestId('decision-output')).toContainText(body.decision.action);
+    > 60 |   await navigate(page,'AI Decisions');await expect(page.getByTestId('decision-output')).toContainText(body.explanation);await page.getByText('Optimization breakdown',{exact:true}).click();await expect(page.getByTestId('decision-output')).toContainText(fmt(body.optimization.grid_import,2));
+         |                                                                                         ^
+      61 |   await navigate(page,'Optimization');await expect(page.getByText('OPTIMAL',{exact:true})).toBeVisible();await expect(page.locator('.objective')).toContainText(fmt(body.optimization.objective_value,2));
+      62 |   expect(errors).toEqual([]);
+      63 | });
+        at /Users/rhythm/Downloads/Rhythm_Accenture/frontend/tests/energy.spec.cjs:60:89
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../docs/evidence/browser-results/energy-orchestrator-POST-l-c5d28-timization-remain-connected/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../docs/evidence/browser-results/energy-orchestrator-POST-l-c5d28-timization-remain-connected/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../docs/evidence/browser-results/energy-orchestrator-POST-l-c5d28-timization-remain-connected/trace.zip
+    Usage:
+
+        npx playwright show-trace ../docs/evidence/browser-results/energy-orchestrator-POST-l-c5d28-timization-remain-connected/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/energy.spec.cjs:78:1 › 15-second polling continues across navigation and refresh ────────
+
+    Error: browserContext.close: ENOSPC: no space left on device, write
+
+    Error: ENOSPC: no space left on device, mkdir '/Users/rhythm/Downloads/Rhythm_Accenture/docs/evidence/browser-results/energy-15-second-polling-c-de438-ross-navigation-and-refresh'
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../docs/evidence/browser-results/energy-15-second-polling-c-de438-ross-navigation-and-refresh/trace.zip
+    Usage:
+
+        npx playwright show-trace ../docs/evidence/browser-results/energy-15-second-polling-c-de438-ross-navigation-and-refresh/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/energy.spec.cjs:82:1 › mobile drawer keyboard escape, focus trap, navigation and reduced motion 
+
+    Error: expect(received).toBeTruthy()
+
+    Received: false
+
+      82 | test('mobile drawer keyboard escape, focus trap, navigation and reduced motion',async({page})=>{
+      83 |   await page.setViewportSize({width:390,height:844});await page.emulateMedia({reducedMotion:'reduce'});await start(page);await page.getByRole('button',{name:'Open navigation'}).click();await expect(page.getByRole('dialog')).toBeVisible();
+    > 84 |   for(let i=0;i<15;i++){await page.keyboard.press('Tab');expect(await page.evaluate(()=>document.activeElement.closest('dialog')!==null)).toBeTruthy();}
+         |                                                                                                                                           ^
+      85 |   await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page.getByRole('button',{name:'Open navigation'})).toBeFocused();await navigate(page,'Scenario Simulator');await expect(page.getByRole('dialog')).not.toBeVisible();
+      86 |   expect(await page.locator('.scenario-card').first().evaluate(e=>getComputedStyle(e).transitionDuration)).toBe('0s');
+      87 | });
+        at /Users/rhythm/Downloads/Rhythm_Accenture/frontend/tests/energy.spec.cjs:84:139
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../docs/evidence/browser-results/energy-mobile-drawer-keybo-bc0bc-vigation-and-reduced-motion/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../docs/evidence/browser-results/energy-mobile-drawer-keybo-bc0bc-vigation-and-reduced-motion/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../docs/evidence/browser-results/energy-mobile-drawer-keybo-bc0bc-vigation-and-reduced-motion/trace.zip
+    Usage:
+
+        npx playwright show-trace ../docs/evidence/browser-results/energy-mobile-drawer-keybo-bc0bc-vigation-and-reduced-motion/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/energy.spec.cjs:53:1 › orchestrator POST, loading state, real decision and optimization remain connected 
+    tests/energy.spec.cjs:78:1 › 15-second polling continues across navigation and refresh ─────────
+    tests/energy.spec.cjs:82:1 › mobile drawer keyboard escape, focus trap, navigation and reduced motion 
+  13 passed (1.6m)

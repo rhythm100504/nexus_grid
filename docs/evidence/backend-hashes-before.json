@@ -1,0 +1,17 @@
+{
+  "backend/tests/test_optimization.py": "373b252f80b758c4ef5f3c9337d5e285aadd70402720722fac425409ed142e7a",
+  "backend/tests/test_api.py": "d1cf7382661e20f3cb32bc891adaa82a6db648690a703f7c54f1e80cc0c53176",
+  "backend/scripts/generate_data.py": "6e20e8296110d2649c2c6b1e4e59952db797f3d23d33af15bb102b19cdc2103f",
+  "backend/app/optimization/engine.py": "a171093b1fa2e2fa0f893f44be356e4520cfa3260cba3c80faa5a351df5e86b4",
+  "backend/app/agents/orchestrator.py": "ed2e19d6e1ce9194a9b1f4b84a128a88ce664f0aa4eb01547eafe2b6026d82f6",
+  "backend/app/agents/state.py": "e1ea958adc913c1c7e86ddf7f9129648cb4cf4c03bff9f77e05ca50d85b0b11e",
+  "backend/app/models/assets.py": "c62b6ca152455d2162a44edd28dc3c964c488e0e546c605057af48b2647b53b7",
+  "backend/app/models/base.py": "9216bdc66925ce1b9000af101243419fe9801eaf1d50a6ce33edda6da0695a64",
+  "backend/app/schemas/assets.py": "a6082914d565fc7820cb067aef0b415cd5304d9dc9045889f3cacb0dbd0e6d6f",
+  "backend/app/db/session.py": "2f5cfacfc10d67ea6ebb606b7b39e56810f71bf19c742e639455bfe02c91722e",
+  "backend/app/api/main.py": "8dff21f04bd4fae0512df7e3fbfbd7093adea27532af9b8ff1dec75a7e73bf35",
+  "backend/app/api/routes.py": "7c4b55ee858d505e73d7a80bf54a2b2b5ff0a707dd0f21464070163684193d2a",
+  "backend/app/forecasting/model.py": "a4f12b095bb71a9633766783723899e742a24df0dde45a7e40b83e7f671b074a",
+  "backend/requirements.txt": "2e525886601c2381b74582777e520fc7eaca587572a2d9baeec1882d96a575db",
+  "docker-compose.yml": "4f6c3a936327eae1406f681a62642adbe46ba2315f678100cb0709eec47f2b8a"
+}

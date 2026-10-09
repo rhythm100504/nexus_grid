@@ -1,0 +1,18 @@
+
+> renewable-energy-orchestrator@0.0.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 996 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.66 kB │ gzip:   0.38 kB
+dist/assets/index-nSnhujTv.css   28.53 kB │ gzip:   6.75 kB
+dist/assets/index-BgRqpZFa.js   762.49 kB │ gzip: 253.26 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.35s

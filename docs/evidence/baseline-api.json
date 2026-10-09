@@ -1,0 +1,941 @@
+{
+  "/health": {
+    "http": 200,
+    "data": {
+      "status": "ok"
+    }
+  },
+  "/api/state": {
+    "http": 200,
+    "data": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 77.03139819269592
+    }
+  },
+  "/api/assets": {
+    "http": 200,
+    "data": {
+      "solar_farms": [
+        {
+          "status": "active",
+          "capacity_mw": 91.65339358991471,
+          "location": "Region A",
+          "name": "Solar Farm 1",
+          "id": 1
+        },
+        {
+          "status": "active",
+          "capacity_mw": 81.94692648279627,
+          "location": "Region A",
+          "name": "Solar Farm 2",
+          "id": 2
+        },
+        {
+          "status": "active",
+          "capacity_mw": 71.88643813704164,
+          "location": "Region A",
+          "name": "Solar Farm 3",
+          "id": 3
+        },
+        {
+          "status": "active",
+          "capacity_mw": 45.65956849416526,
+          "location": "Region A",
+          "name": "Solar Farm 4",
+          "id": 4
+        },
+        {
+          "status": "active",
+          "capacity_mw": 30.103021215916748,
+          "location": "Region A",
+          "name": "Solar Farm 5",
+          "id": 5
+        }
+      ],
+      "wind_farms": [
+        {
+          "name": "Wind Farm 1",
+          "capacity_mw": 87.79381271000088,
+          "status": "active",
+          "id": 1,
+          "location": "Region B"
+        },
+        {
+          "name": "Wind Farm 2",
+          "capacity_mw": 142.08752346365657,
+          "status": "active",
+          "id": 2,
+          "location": "Region B"
+        },
+        {
+          "name": "Wind Farm 3",
+          "capacity_mw": 98.38700256222621,
+          "status": "active",
+          "id": 3,
+          "location": "Region B"
+        }
+      ],
+      "batteries": [
+        {
+          "id": 1,
+          "max_charge_rate_mw": 50.0,
+          "charge_efficiency": 0.9,
+          "degradation_factor": 0.01,
+          "max_discharge_rate_mw": 50.0,
+          "name": "Battery 1",
+          "capacity_mwh": 100.0,
+          "current_soc": 0.5,
+          "status": "active"
+        },
+        {
+          "id": 2,
+          "max_charge_rate_mw": 50.0,
+          "charge_efficiency": 0.9,
+          "degradation_factor": 0.01,
+          "max_discharge_rate_mw": 50.0,
+          "name": "Battery 2",
+          "capacity_mwh": 100.0,
+          "current_soc": 0.5,
+          "status": "active"
+        }
+      ]
+    }
+  },
+  "/api/solar": {
+    "http": 200,
+    "data": [
+      {
+        "status": "active",
+        "capacity_mw": 91.65339358991471,
+        "location": "Region A",
+        "name": "Solar Farm 1",
+        "id": 1
+      },
+      {
+        "status": "active",
+        "capacity_mw": 81.94692648279627,
+        "location": "Region A",
+        "name": "Solar Farm 2",
+        "id": 2
+      },
+      {
+        "status": "active",
+        "capacity_mw": 71.88643813704164,
+        "location": "Region A",
+        "name": "Solar Farm 3",
+        "id": 3
+      },
+      {
+        "status": "active",
+        "capacity_mw": 45.65956849416526,
+        "location": "Region A",
+        "name": "Solar Farm 4",
+        "id": 4
+      },
+      {
+        "status": "active",
+        "capacity_mw": 30.103021215916748,
+        "location": "Region A",
+        "name": "Solar Farm 5",
+        "id": 5
+      }
+    ]
+  },
+  "/api/wind": {
+    "http": 200,
+    "data": [
+      {
+        "name": "Wind Farm 1",
+        "capacity_mw": 87.79381271000088,
+        "status": "active",
+        "id": 1,
+        "location": "Region B"
+      },
+      {
+        "name": "Wind Farm 2",
+        "capacity_mw": 142.08752346365657,
+        "status": "active",
+        "id": 2,
+        "location": "Region B"
+      },
+      {
+        "name": "Wind Farm 3",
+        "capacity_mw": 98.38700256222621,
+        "status": "active",
+        "id": 3,
+        "location": "Region B"
+      }
+    ]
+  },
+  "/api/batteries": {
+    "http": 200,
+    "data": [
+      {
+        "id": 1,
+        "max_charge_rate_mw": 50.0,
+        "charge_efficiency": 0.9,
+        "degradation_factor": 0.01,
+        "max_discharge_rate_mw": 50.0,
+        "name": "Battery 1",
+        "capacity_mwh": 100.0,
+        "current_soc": 0.5,
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "max_charge_rate_mw": 50.0,
+        "charge_efficiency": 0.9,
+        "degradation_factor": 0.01,
+        "max_discharge_rate_mw": 50.0,
+        "name": "Battery 2",
+        "capacity_mwh": 100.0,
+        "current_soc": 0.5,
+        "status": "active"
+      }
+    ]
+  },
+  "/api/grid": {
+    "http": 200,
+    "data": [
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T02:11:20.007313",
+        "current_demand_mw": 315.0787516766517,
+        "id": 96,
+        "grid_frequency_hz": 49.954867338839584
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T01:56:20.007313",
+        "current_demand_mw": 292.3911816270016,
+        "id": 95,
+        "grid_frequency_hz": 50.04202561091408
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T01:41:20.007313",
+        "current_demand_mw": 306.5096586900311,
+        "id": 94,
+        "grid_frequency_hz": 49.98875240332936
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T01:26:20.007313",
+        "current_demand_mw": 316.00933795530455,
+        "id": 93,
+        "grid_frequency_hz": 50.04203145683363
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T01:11:20.007313",
+        "current_demand_mw": 285.24738930517265,
+        "id": 92,
+        "grid_frequency_hz": 50.03723689448387
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T00:56:20.007313",
+        "current_demand_mw": 313.80106968629525,
+        "id": 91,
+        "grid_frequency_hz": 50.04096407252943
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T00:41:20.007313",
+        "current_demand_mw": 295.59969939439833,
+        "id": 90,
+        "grid_frequency_hz": 49.995021220750964
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T00:26:20.007313",
+        "current_demand_mw": 302.5935261407387,
+        "id": 89,
+        "grid_frequency_hz": 50.031537182266604
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-09T00:11:20.007313",
+        "current_demand_mw": 309.25545776222845,
+        "id": 88,
+        "grid_frequency_hz": 49.972018334735196
+      },
+      {
+        "transmission_capacity_mw": 1000.0,
+        "timestamp": "2026-10-08T23:56:20.007313",
+        "current_demand_mw": 315.10853144094153,
+        "id": 87,
+        "grid_frequency_hz": 50.034310394715924
+      }
+    ]
+  },
+  "/api/market": {
+    "http": 200,
+    "data": [
+      {
+        "id": 96,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T02:11:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 77.03139819269592
+      },
+      {
+        "id": 95,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T01:56:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 79.35849815767034
+      },
+      {
+        "id": 94,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T01:41:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 76.29577421130313
+      },
+      {
+        "id": 93,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T01:26:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 76.05379306378745
+      },
+      {
+        "id": 92,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T01:11:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 81.89037959731024
+      },
+      {
+        "id": 91,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T00:56:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 78.27337638099257
+      },
+      {
+        "id": 90,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T00:41:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 84.07088718796163
+      },
+      {
+        "id": 89,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T00:26:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 81.81753068829657
+      },
+      {
+        "id": 88,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-09T00:11:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 84.85375495734448
+      },
+      {
+        "id": 87,
+        "carbon_price_ton": 40.0,
+        "timestamp": "2026-10-08T23:56:20.007313",
+        "demand_response_incentive": 10.0,
+        "electricity_price_mwh": 76.85351456110931
+      }
+    ]
+  },
+  "/api/weather": {
+    "http": 200,
+    "data": {
+      "status": "sunny",
+      "temperature_c": 25,
+      "wind_speed_ms": 10
+    }
+  },
+  "/api/forecasts": {
+    "http": 200,
+    "data": {
+      "solar_1hr": 150,
+      "wind_1hr": 90,
+      "demand_1hr": 350
+    }
+  },
+  "/api/decisions": {
+    "http": 200,
+    "data": []
+  },
+  "/api/actions": {
+    "http": 200,
+    "data": []
+  },
+  "/api/analytics": {
+    "http": 200,
+    "data": {
+      "cost_savings": 15000,
+      "carbon_reduction_tons": 45
+    }
+  },
+  "/api/audit": {
+    "http": 200,
+    "data": []
+  },
+  "/api/scenarios": {
+    "http": 404,
+    "data": {
+      "detail": "Not Found"
+    }
+  },
+  "orchestrator": {
+    "http": 200,
+    "data": {
+      "status": "success",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    }
+  },
+  "scenario_1": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 77.03139819269592
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 1,
+      "message": "Injected: Solar generation dropped 40%",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 77.03139819269592
+    }
+  },
+  "scenario_2": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 77.03139819269592
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 2,
+      "message": "Injected: Wind generation increased 30%",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 77.03139819269592
+    }
+  },
+  "scenario_3": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 77.03139819269592
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 3,
+      "message": "Injected: Electricity price increased 100%",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_4": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 315.0787516766517,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 4,
+      "message": "Injected: Grid demand increased 25%",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_5": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 5,
+      "message": "Injected: Battery B1 unavailable",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_6": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 6,
+      "message": "Injected: Transmission capacity reached",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_7": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 7,
+      "message": "Injected: Storm warning",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_8": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 8,
+      "message": "Injected: Weather forecast change",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_9": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 393.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 9,
+      "message": "Injected: Industrial demand spike",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 593.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    }
+  },
+  "scenario_10": {
+    "http": 200,
+    "before": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 593.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 154.06279638539183
+    },
+    "data": {
+      "status": "success",
+      "scenario_id": 10,
+      "message": "Injected: Multiple simultaneous events (Solar drop, price spike)",
+      "decision": {
+        "action": "optimal_dispatch",
+        "details": {
+          "status": "OPTIMAL",
+          "solar_gen": 150.0,
+          "wind_gen": 80.0,
+          "grid_import": 870.0,
+          "grid_export": 1000.0,
+          "battery_charge": 0.0,
+          "battery_discharge": 50.0,
+          "solar_curtail": 0.0,
+          "wind_curtail": 0.0,
+          "objective_value": -34500.0
+        }
+      },
+      "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+      "optimization": {
+        "status": "OPTIMAL",
+        "solar_gen": 150.0,
+        "wind_gen": 80.0,
+        "grid_import": 870.0,
+        "grid_export": 1000.0,
+        "battery_charge": 0.0,
+        "battery_discharge": 50.0,
+        "solar_curtail": 0.0,
+        "wind_curtail": 0.0,
+        "objective_value": -34500.0
+      }
+    },
+    "after": {
+      "solar_mw": 224.87454354388422,
+      "wind_mw": 196.9610032415302,
+      "demand_mw": 593.8484395958146,
+      "battery_soc": 50.0,
+      "electricity_price": 231.09419457808775
+    }
+  },
+  "approve": {
+    "http": 200,
+    "data": {
+      "status": "approved",
+      "action_id": 999
+    },
+    "actions_after": []
+  },
+  "reject": {
+    "http": 200,
+    "data": {
+      "status": "rejected",
+      "action_id": 999
+    },
+    "actions_after": []
+  }
+}

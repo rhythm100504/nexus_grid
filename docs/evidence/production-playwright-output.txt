@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+(node:22186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/energy.spec.cjs:119:1 › real API values render on dashboard, assets, batteries, grid, forecasts and analytics (1.8s)
+  ✓  2 tests/energy.spec.cjs:189:1 › orchestrator POST, loading state, real decision and optimization remain connected (1.0s)
+  ✓  3 tests/energy.spec.cjs:235:1 › all nine existing scenario controls invoke real backend and update dashboard and audit (2.5s)
+  ✓  4 tests/energy.spec.cjs:318:1 › mobile drawer keyboard escape, focus trap, navigation and reduced motion (568ms)
+  ✓  5 tests/energy.spec.cjs:426:1 › chart tooltips show actual units and survive repeated responsive resizing (2.8s)
+
+  5 passed (11.3s)

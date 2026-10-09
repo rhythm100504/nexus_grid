@@ -1,0 +1,88 @@
+{
+  "verified_at": "2026-10-08T22:36:57.203Z",
+  "preview": "http://127.0.0.1:4173",
+  "environment": "isolated seeded SQLite; real FastAPI and LangGraph/OR-Tools; no external telemetry",
+  "before": {
+    "solar_mw": 224.87454354388422,
+    "wind_mw": 196.9610032415302,
+    "demand_mw": 3453.6878649774617,
+    "battery_soc": 50,
+    "electricity_price": 7395.014226498808
+  },
+  "scenario": {
+    "status": "success",
+    "scenario_id": 4,
+    "message": "Injected: Grid demand increased 25%",
+    "decision": {
+      "action": "optimal_dispatch",
+      "details": {
+        "status": "OPTIMAL",
+        "solar_gen": 150,
+        "wind_gen": 80,
+        "grid_import": 870,
+        "grid_export": 1000,
+        "battery_charge": 0,
+        "battery_discharge": 50,
+        "solar_curtail": 0,
+        "wind_curtail": 0,
+        "objective_value": -34500
+      }
+    },
+    "explanation": "Optimization resulted in discharging 50.0 MW and curtailing 0.0 MW. (LLM Key Missing)",
+    "optimization": {
+      "status": "OPTIMAL",
+      "solar_gen": 150,
+      "wind_gen": 80,
+      "grid_import": 870,
+      "grid_export": 1000,
+      "battery_charge": 0,
+      "battery_discharge": 50,
+      "solar_curtail": 0,
+      "wind_curtail": 0,
+      "objective_value": -34500
+    }
+  },
+  "after": {
+    "solar_mw": 224.87454354388422,
+    "wind_mw": 196.9610032415302,
+    "demand_mw": 4317.109831221827,
+    "battery_soc": 50,
+    "electricity_price": 7395.014226498808
+  },
+  "state_responses": [
+    {
+      "received_at": "2026-10-08T22:36:41.660Z",
+      "http": 200,
+      "state": {
+        "solar_mw": 224.87454354388422,
+        "wind_mw": 196.9610032415302,
+        "demand_mw": 3453.6878649774617,
+        "battery_soc": 50,
+        "electricity_price": 7395.014226498808
+      }
+    },
+    {
+      "received_at": "2026-10-08T22:36:57.063Z",
+      "http": 200,
+      "state": {
+        "solar_mw": 224.87454354388422,
+        "wind_mw": 196.9610032415302,
+        "demand_mw": 4317.109831221827,
+        "battery_soc": 50,
+        "electricity_price": 7395.014226498808
+      }
+    }
+  ],
+  "result": "PASS: backend demand change became visible through periodic polling without navigation, UI scenario click, or page refresh",
+  "fixed_sources": [
+    "solar/wind capacity multipliers",
+    "weather constants",
+    "forecast constants",
+    "analytics constants"
+  ],
+  "limitations": [
+    "No external feed ingestion",
+    "No background simulation clock or automatic orchestration",
+    "Scenario 4 changes grid demand but fallback agent loses observed demand"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "backend": {
+    "passed": 35,
+    "existing_requirement_failures_xfail": 20
+  },
+  "browser": {
+    "passed": 17,
+    "failed": 0,
+    "responsive_page_viewport_checks": 72,
+    "accessibility_pages": 12
+  },
+  "production_smoke": {
+    "passed": 5,
+    "failed": 0
+  },
+  "backend_production_files_unchanged": true,
+  "demo_status": "UI prototype ready; full original requirements not satisfied",
+  "bundle": {
+    "baseline_js_kb": 1267.51,
+    "final_js_kb": 762.49,
+    "baseline_gzip_kb": 419.52,
+    "final_gzip_kb": 253.26
+  },
+  "live_backend_update_verification": {
+    "passed": 1,
+    "method": "real backend demand scenario update detected by periodic polling, without UI action or refresh",
+    "external_live_feeds_connected": false,
+    "evidence": "live-data-verification.json; live-polling-test.txt"
+  }
+}

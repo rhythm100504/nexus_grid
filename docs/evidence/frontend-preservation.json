@@ -1,0 +1,42 @@
+{
+  "original_app_sha256": "805893d266a413840675d2e1b05e531051393899e565bdfe44438b40c9bbbaa7",
+  "request_urls_preserved": {
+    "http://localhost:8000/api/state": {
+      "before": true,
+      "after": true
+    },
+    "http://localhost:8000/api/orchestrator/run": {
+      "before": true,
+      "after": true
+    },
+    "http://localhost:8000/api/scenarios/run?scenario_id=${id}": {
+      "before": true,
+      "after": true
+    }
+  },
+  "poll_interval_ms": 15000,
+  "scenario_controls_before": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "scenario_controls_after": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "navigation_before_and_after_count": 12,
+  "runtime_dependencies_added": 0
+}

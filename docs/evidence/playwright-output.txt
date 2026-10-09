@@ -1,0 +1,24 @@
+
+Running 17 tests using 1 worker
+
+(node:22266) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/energy.spec.cjs:56:3 › all 12 pages responsive at 1920px (4.7s)
+  ✓   2 tests/energy.spec.cjs:56:3 › all 12 pages responsive at 1440px (5.2s)
+  ✓   3 tests/energy.spec.cjs:56:3 › all 12 pages responsive at 1024px (4.4s)
+  ✓   4 tests/energy.spec.cjs:56:3 › all 12 pages responsive at 768px (4.8s)
+  ✓   5 tests/energy.spec.cjs:56:3 › all 12 pages responsive at 390px (5.8s)
+  ✓   6 tests/energy.spec.cjs:56:3 › all 12 pages responsive at 320px (4.7s)
+  ✓   7 tests/energy.spec.cjs:102:1 › every page passes axe WCAG A/AA checks (4.4s)
+  ✓   8 tests/energy.spec.cjs:119:1 › real API values render on dashboard, assets, batteries, grid, forecasts and analytics (1.3s)
+  ✓   9 tests/energy.spec.cjs:189:1 › orchestrator POST, loading state, real decision and optimization remain connected (1.1s)
+  ✓  10 tests/energy.spec.cjs:235:1 › all nine existing scenario controls invoke real backend and update dashboard and audit (2.5s)
+  ✓  11 tests/energy.spec.cjs:300:1 › 15-second polling continues across navigation and refresh (15.5s)
+  ✓  12 tests/energy.spec.cjs:318:1 › mobile drawer keyboard escape, focus trap, navigation and reduced motion (615ms)
+  ✓  13 tests/energy.spec.cjs:350:1 › offline state and failed execution show errors without fabricated success (604ms)
+  ✓  14 tests/energy.spec.cjs:371:1 › stale state retains values and labels lost connection (15.6s)
+  ✓  15 tests/energy.spec.cjs:383:1 › read-only resources handle HTTP errors and empty responses explicitly (805ms)
+  ✓  16 tests/energy.spec.cjs:411:1 › slow real requests display loading skeletons without false values (1.2s)
+  ✓  17 tests/energy.spec.cjs:426:1 › chart tooltips show actual units and survive repeated responsive resizing (2.8s)
+
+  17 passed (1.3m)

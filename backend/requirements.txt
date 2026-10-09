@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+psycopg2-binary
+redis
+kafka-python
+ortools
+xgboost
+langgraph
+langchain
+langchain-core
+langchain-google-genai
+python-dotenv
+pytest
