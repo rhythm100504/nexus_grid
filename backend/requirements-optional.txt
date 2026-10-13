@@ -1,0 +1,6 @@
+# Optional forecasting stub and infrastructure experiments (not used by the API).
+-r requirements.txt
+xgboost
+redis
+kafka-python
+langchain

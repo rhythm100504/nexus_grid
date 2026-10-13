@@ -1,6 +1,11 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, JSON, DateTime
 from .base import Base
 
+class SimulationConfig(Base):
+    __tablename__ = "simulation_config"
+    id = Column(Integer, primary_key=True)
+    values = Column(JSON)
+
 class SolarFarm(Base):
     __tablename__ = "solar_farms"
     id = Column(Integer, primary_key=True, index=True)

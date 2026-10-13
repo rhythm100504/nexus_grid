@@ -7,7 +7,8 @@ import json
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+if os.getenv("VERCEL") != "1":
+    load_dotenv()
 
 # Initialize Gemini LLM, fallback to dummy if no key provided for demo resilience
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -17,63 +18,88 @@ else:
     llm = None
 
 def analyze_situation(state: AgentState):
+    situation = state.setdefault('current_situation', {})
+    situation['summary'] = f"Demand {situation.get('demand', 0):.1f} MW at ${situation.get('price', 0):.2f}/MWh."
     if llm:
-        sys_prompt = "You are a Renewable Energy Analyst. Summarize the grid state briefly."
-        user_prompt = f"Current grid situation: demand is {state.get('current_situation', {}).get('demand', 200)} MW at ${state.get('current_situation', {}).get('price', 50)}/MWh. What is the outlook?"
-        response = llm.invoke([SystemMessage(content=sys_prompt), HumanMessage(content=user_prompt)])
-        state['current_situation']['summary'] = response.content
-    else:
-        state['current_situation'] = {"summary": "Analyzed state (LLM Key Missing)"}
+        try:
+            response = llm.invoke([HumanMessage(content=f"Summarize this simulated grid: {situation}")])
+            situation['summary'] = response.content
+        except Exception:
+            situation['summary'] += ' Language model unavailable; using numerical inputs.'
     return state
+
 
 def check_forecasts(state: AgentState):
-    state['forecasts'] = {"solar": 100, "wind": 50, "demand": 150}
+    if not state.get('forecasts'):
+        situation = state['current_situation']
+        state['forecasts'] = {'demand_1hr': situation.get('demand', 0) * 1.05}
     return state
+
 
 def check_constraints(state: AgentState):
-    state['constraints'] = {"transmission": "OK", "battery": "OK"}
+    situation = state['current_situation']
+    state['constraints'] = {'transmission_mw': situation.get('transmission_capacity', 1000),
+                            'available_batteries': sum(b['available'] for b in situation.get('batteries', []))}
     return state
+
 
 def generate_options(state: AgentState):
-    state['options'] = [{"action": "charge_battery"}, {"action": "sell_to_grid"}]
+    state['options'] = [{'action': 'renewable_dispatch'}, {'action': 'battery_support'}, {'action': 'grid_exchange'}]
     return state
+
 
 def optimize(state: AgentState):
-    mock_opt_state = {
-        'solar_capacity': 200, 'wind_capacity': 100,
-        'demand': state.get('current_situation', {}).get('demand', 150),
-        'transmission_capacity': 1000,
-        'battery_max_discharge': 50, 'battery_max_charge': 50,
-        'solar_available': 150, 'wind_available': 80,
-        'battery_soc': 0.5, 'battery_capacity': 100,
-        'electricity_price': state.get('current_situation', {}).get('price', 50)
-    }
-    weights = {'cost': 1.0, 'carbon': 1.0}
-    state['optimization_result'] = run_optimization(mock_opt_state, weights)
+    situation = state['current_situation']
+    state['optimization_result'] = run_optimization(situation, situation.get('weights', {'cost': 1, 'carbon': 1}))
     return state
+
 
 def validate(state: AgentState):
-    state['validation_status'] = "PASSED"
+    result = state.get('optimization_result', {})
+    valid = result.get('status') == 'OPTIMAL'
+    if valid and 'demand' in state.get('current_situation', {}):
+        supply = sum(result.get(k, 0) for k in ['solar_gen', 'wind_gen', 'grid_import', 'battery_discharge'])
+        demand = state['current_situation']['demand'] + result.get('grid_export', 0) + result.get('battery_charge', 0)
+        valid = abs(supply - demand) < 1e-5
+    state['validation_status'] = 'PASSED' if valid else 'FAILED'
     return state
+
 
 def simulate(state: AgentState):
-    state['simulation_result'] = {"expected_impact": "Positive"}
+    result = state.get('optimization_result', {})
+    state['simulation_result'] = {'feasible': state['validation_status'] == 'PASSED',
+                                  'electricity_cost': result.get('electricity_cost'),
+                                  'carbon_tons': result.get('carbon_tons')}
     return state
+
 
 def evaluate_and_decide(state: AgentState):
-    state['decision'] = {"action": "optimal_dispatch", "details": state.get('optimization_result')}
+    state['decision'] = {'action': 'optimal_dispatch' if state['validation_status'] == 'PASSED' else 'review_required',
+                         'details': state.get('optimization_result')}
     return state
 
+
 def explain(state: AgentState):
-    opt_res = state.get('optimization_result', {})
+    result = state.get('optimization_result', {})
+    demand = state.get('current_situation', {}).get('demand', 0)
+    if state.get('validation_status') != 'PASSED':
+        state['explanation'] = f"No feasible dispatch for demand of {demand:.1f} MW under the current storage and transmission limits. Operator review is required."
+        return state
+    state['explanation'] = (
+        f"For demand of {demand:.1f} MW, use {result.get('solar_gen', 0):.1f} MW solar and "
+        f"{result.get('wind_gen', 0):.1f} MW wind. Discharge {result.get('battery_discharge', 0):.1f} MW "
+        f"from batteries, charge {result.get('battery_charge', 0):.1f} MW, import "
+        f"{result.get('grid_import', 0):.1f} MW and export {result.get('grid_export', 0):.1f} MW. "
+        "This balances the simulated demand within asset and transmission limits. (Solver-based explanation)"
+    )
     if llm:
-        sys_prompt = "You are a Decision Explanation Agent for a renewable energy orchestrator. Explain the optimization decision clearly in 2-3 sentences based on the data."
-        user_prompt = f"Optimization resulted in: battery_discharge={opt_res.get('battery_discharge', 0)} MW, solar_curtail={opt_res.get('solar_curtail', 0)} MW, grid_import={opt_res.get('grid_import', 0)} MW. Why was this chosen?"
-        response = llm.invoke([SystemMessage(content=sys_prompt), HumanMessage(content=user_prompt)])
-        state['explanation'] = response.content
-    else:
-        state['explanation'] = f"Optimization resulted in discharging {opt_res.get('battery_discharge', 0)} MW and curtailing {opt_res.get('solar_curtail', 0)} MW. (LLM Key Missing)"
+        try:
+            response = llm.invoke([HumanMessage(content=f"Explain this simulated dispatch in 2 sentences: demand={demand}, result={result}")])
+            state['explanation'] = response.content
+        except Exception:
+            pass
     return state
+
 
 def build_graph():
     workflow = StateGraph(AgentState)

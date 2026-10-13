@@ -1,4 +1,4 @@
-"""Real backend regression and requirement checks; strict xfails expose existing gaps.
+"""Real backend regression and requirement checks; strict xfails identify future autonomy gaps.
 Temporary SQLite data and the existing no-key LLM fallback are used only for QA.
 """
 import datetime
@@ -59,7 +59,7 @@ def test_real_orchestrator(client):
     assert body['optimization']['status'] == 'OPTIMAL'
     assert body['decision']['details'] == body['optimization']
     assert str(body['optimization']['battery_discharge']) in body['explanation']
-    assert client.get('/api/audit').json() == []
+    assert len(client.get('/api/audit').json()) == 1
 
 @pytest.mark.parametrize('scenario_id',range(1,11))
 def test_scenarios_audit_state_and_decision(client,scenario_id):
@@ -99,39 +99,35 @@ def test_optimizer_physical_constraints(soc):
     assert r['solar_gen']+r['wind_gen']+r['grid_import']+r['battery_discharge'] == pytest.approx(state['demand']+r['grid_export']+r['battery_charge'])
 
 def test_competing_objectives():
-    results = [run_optimization(opt_state(),{'cost':1,'carbon':c}) for c in [0,100]]
+    state = opt_state(); state.update(demand=300, electricity_price=0)
+    results = [run_optimization(state,{'cost':1,'carbon':c}) for c in [0,100]]
     assert all(r['status']=='OPTIMAL' for r in results)
     assert results[0]['grid_import'] != results[1]['grid_import']
 
 def test_graph_node_execution_order(client):
-    initial = {'current_situation':{'demand':300,'price':50},'forecasts':{},'constraints':{},'options':[],'optimization_result':{},'validation_status':'','simulation_result':{},'decision':{},'explanation':'','action_status':'','messages':[]}
+    initial = {'current_situation':{**opt_state(),'demand':300,'price':50},'forecasts':{},'constraints':{},'options':[],'optimization_result':{},'validation_status':'','simulation_result':{},'decision':{},'explanation':'','action_status':'','messages':[]}
     updates = list(orchestrator.agent_app.stream(initial))
     assert [next(iter(u)) for u in updates] == ['analyze_situation','check_forecasts','check_constraints','generate_options','optimize','validate','simulate','evaluate_and_decide','explain']
 
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: documented GET scenario catalog absent')
 def test_requirement_scenario_catalog(client):
     assert client.get('/api/scenarios').status_code == 200
 
 @pytest.mark.parametrize('scenario_id,endpoint,field,multiplier',[(1,'state','solar_mw',.6),(2,'state','wind_mw',1.3)])
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: renewable event does not change generation')
 def test_requirement_renewable_scenarios(client,scenario_id,endpoint,field,multiplier):
     before = client.get('/api/'+endpoint).json()[field]
     client.post('/api/scenarios/run',params={'scenario_id':scenario_id})
     assert client.get('/api/'+endpoint).json()[field] == pytest.approx(before*multiplier)
 
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: battery event does not change availability')
 def test_requirement_battery_outage(client):
     client.post('/api/scenarios/run?scenario_id=5')
     assert client.get('/api/batteries').json()[0]['status'] != 'active'
 
 @pytest.mark.parametrize('scenario_id,endpoint',[(7,'weather'),(8,'forecasts')])
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: storm/forecast event leaves relevant data unchanged')
 def test_requirement_environment_scenarios(client,scenario_id,endpoint):
     before = client.get('/api/'+endpoint).json()
     client.post('/api/scenarios/run',params={'scenario_id':scenario_id})
     assert client.get('/api/'+endpoint).json() != before
 
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: multiple events does not include solar change')
 def test_requirement_multiple_events(client):
     before = client.get('/api/state').json()
     client.post('/api/scenarios/run?scenario_id=10')
@@ -139,7 +135,6 @@ def test_requirement_multiple_events(client):
     assert after['electricity_price'] != before['electricity_price']
     assert after['solar_mw'] != before['solar_mw']
 
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: fallback discards observed demand and price')
 def test_requirement_observed_state(client):
     result = orchestrator.analyze_situation({'current_situation':{'demand':375,'price':100}})
     assert result['current_situation']['demand'] == 375
@@ -150,12 +145,10 @@ def test_requirement_replan(client):
     nodes = orchestrator.agent_app.get_graph().nodes
     assert all(n in nodes for n in ['execute','monitor','replan'])
 
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: validation unconditionally PASSED')
 def test_requirement_validation(client):
     assert orchestrator.validate({'optimization_result':{'status':'INFEASIBLE'}})['validation_status'] != 'PASSED'
 
 @pytest.mark.parametrize('requirement',['transmission','reserve','asset_availability','market'])
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: missing import/reserve/availability/market constraint')
 def test_requirement_optimizer_constraints(requirement):
     state = opt_state()
     state.update(demand=300,solar_available=0,wind_available=0)
@@ -175,10 +168,101 @@ def test_requirement_risk_approval(client,risk):
     assert 'risk_level' in result['decision'] and 'approval_status' in result['decision']
 
 @pytest.mark.parametrize('verb',['approve','reject'])
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: unknown actions accepted without persistence')
 def test_requirement_approval_persistence(client,verb):
     assert client.post(f'/api/actions/999/{verb}').status_code == 404
 
-@pytest.mark.xfail(strict=True,reason='PRE-EXISTING: fixed forecasts have no timestamp')
 def test_requirement_forecast_timestamp(client):
     assert 'timestamp' in client.get('/api/forecasts').json()
+
+
+def test_demand_scenario_reaches_dispatch_and_power_balance(client):
+    before = client.post('/api/orchestrator/run').json()
+    after = client.post('/api/scenarios/run?scenario_id=4').json()
+    assert after['before']['demand_mw'] == 300
+    assert after['after']['demand_mw'] == 375
+    result = after['optimization']
+    supply = sum(result[k] for k in ['solar_gen', 'wind_gen', 'grid_import', 'battery_discharge'])
+    assert supply == pytest.approx(375 + result['grid_export'] + result['battery_charge'])
+    assert result['grid_import'] != before['optimization']['grid_import'] or result['grid_export'] != before['optimization']['grid_export']
+    assert '375.0 MW' in after['explanation']
+
+
+def test_price_scenario_changes_model_cost(client):
+    before = client.post('/api/orchestrator/run').json()['optimization']
+    after = client.post('/api/scenarios/run?scenario_id=3').json()['optimization']
+    assert after['electricity_cost'] == pytest.approx(before['electricity_cost'] * 2)
+
+
+def test_no_simultaneous_opposing_flows(client):
+    result = client.post('/api/orchestrator/run').json()['optimization']
+    assert result['grid_import'] * result['grid_export'] == 0
+    assert result['battery_charge'] * result['battery_discharge'] == 0
+
+
+def test_battery_outage_changes_dispatch(client):
+    before = client.post('/api/scenarios/run?scenario_id=9').json()['optimization']
+    after = client.post('/api/scenarios/run?scenario_id=5').json()['optimization']
+    assert after['battery_discharge'] <= 50
+    assert after['battery_discharge'] < before['battery_discharge']
+    assert after['grid_import'] > before['grid_import']
+
+
+def test_alerts_reflect_storm_and_outage(client):
+    assert client.get('/api/alerts').json() == []
+    client.post('/api/scenarios/run?scenario_id=5')
+    client.post('/api/scenarios/run?scenario_id=7')
+    alerts = client.get('/api/alerts').json()
+    assert any(a['id'] == 'storm' for a in alerts)
+    assert any(a['id'].startswith('battery-') for a in alerts)
+
+
+def test_settings_persist_validate_and_affect_next_dispatch(client):
+    settings = dict(cost_weight=2, carbon_weight=3, battery_reserve_percent=100)
+    assert client.put('/api/settings', json=settings).json() == settings
+    assert client.get('/api/settings').json() == settings
+    client.post('/api/scenarios/run?scenario_id=9')
+    assert client.post('/api/orchestrator/run').json()['optimization']['battery_discharge'] == 0
+    assert client.put('/api/settings', json={**settings, 'battery_reserve_percent':101}).status_code == 422
+    assert client.get('/api/settings').json() == settings
+
+
+def test_forecasts_and_analytics_derive_from_recorded_state(client):
+    baseline = client.get('/api/forecasts').json()
+    assert client.get('/api/analytics').json()['recommendation_count'] == 0
+    client.post('/api/scenarios/run?scenario_id=4')
+    forecast = client.get('/api/forecasts').json()
+    assert forecast['demand_1hr'] == pytest.approx(baseline['demand_1hr'] * 1.25)
+    analytics = client.get('/api/analytics').json()
+    audit = client.get('/api/audit').json()[0]['details']['optimization_result']
+    assert analytics['cost_savings'] == pytest.approx(audit['baseline_cost'] - audit['electricity_cost'])
+    assert analytics['carbon_reduction_tons'] == pytest.approx(audit['baseline_carbon_tons'] - audit['carbon_tons'])
+
+
+def test_reset_restores_starting_conditions_without_erasing_history(client):
+    before = client.get('/api/state').json()
+    for scenario in [1,2,3,4,5,6,7,8,9,10]:
+        client.post(f'/api/scenarios/run?scenario_id={scenario}')
+    response = client.post('/api/simulation/reset')
+    assert response.status_code == 200
+    assert client.get('/api/state').json() == before
+    assert all(b['status'] == 'active' for b in client.get('/api/batteries').json())
+    assert client.get('/api/weather').json()['status'] == 'sunny'
+    assert len(client.get('/api/audit').json()) == 11
+    assert client.get('/api/alerts').json() == []
+
+
+def test_invalid_scenario_and_missing_history_are_errors(client):
+    for scenario in [0, -1, 11]:
+        assert client.post(f'/api/scenarios/run?scenario_id={scenario}').status_code == 422
+    assert client.get('/api/decisions/99999').status_code == 404
+    assert client.get('/api/audit').json() == []
+
+
+def test_infeasible_dispatch_is_not_reported_as_success(client):
+    client.post('/api/scenarios/run?scenario_id=9')
+    client.post('/api/scenarios/run?scenario_id=6')
+    response = client.post('/api/scenarios/run?scenario_id=7').json()
+    assert response['status'] == 'infeasible'
+    assert response['optimization']['status'] == 'INFEASIBLE'
+    assert response['decision']['action'] == 'review_required'
+    assert 'No feasible dispatch' in response['explanation']
