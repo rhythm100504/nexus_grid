@@ -16,7 +16,7 @@ export function useResource<T>(path: string, enabled: boolean) {
       setLoading(true);
       try {
         const response = await axios.get<T>(
-          `http://localhost:8000/api/${path}`,
+          `/api/${path}`,
           { signal: controller.signal },
         );
         if (!controller.signal.aborted) {
@@ -33,9 +33,11 @@ export function useResource<T>(path: string, enabled: boolean) {
     };
     void load();
     const interval = window.setInterval(load, 15000);
+    window.addEventListener("resources-changed", load);
     return () => {
       controller.abort();
       window.clearInterval(interval);
+      window.removeEventListener("resources-changed", load);
     };
   }, [path, enabled]);
   return { data, error, loading };

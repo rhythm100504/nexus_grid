@@ -1,0 +1,23 @@
+{
+  "before": 444.75782890771814,
+  "after": 555.9472861346477,
+  "reset": 444.75782890771814,
+  "dispatch": {
+    "solar_gen": 210.68336685870347,
+    "wind_gen": 206.27081967540974,
+    "grid_import": 38.99309960053449,
+    "grid_export": 0,
+    "solar_curtail": 0,
+    "wind_curtail": 0,
+    "status": "OPTIMAL",
+    "battery_charge": 0,
+    "battery_discharge": 100,
+    "objective_value": 1239.278725068549,
+    "interval_hours": 0.25,
+    "electricity_cost": 919.3132270658765,
+    "carbon_tons": 4.8741374500668115,
+    "baseline_cost": 13107.183038302333,
+    "baseline_carbon_tons": 69.49341076683096
+  },
+  "browserErrors": []
+}

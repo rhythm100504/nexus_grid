@@ -68,6 +68,18 @@ export function DecisionOutput({
             <Badge tone="cyan">Simulation</Badge>
           </div>
           {result.message && <p className="notice">{result.message}</p>}
+          {result.before && result.after && (
+            <div className="scenario-impact" data-testid="scenario-impact">
+              <span className="eyebrow">Before and after this scenario</span>
+              <DataList rows={([
+                ["Grid demand", "demand_mw", "MW"],
+                ["Solar generation", "solar_mw", "MW"],
+                ["Wind generation", "wind_mw", "MW"],
+                ["Electricity price", "electricity_price", "$/MWh"],
+              ] as const).map(([label, key, unit]) => [label,
+                `${number(result.before![key])} → ${number(result.after![key])} ${unit}`])} />
+            </div>
+          )}
           <div className="reasoning">
             <span className="eyebrow">Agent explanation</span>
             <p>

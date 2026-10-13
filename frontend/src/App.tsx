@@ -134,6 +134,7 @@ const navigation: {
   },
 ];
 const scenarios = [
+  // Each control updates persistent simulation inputs before computing a decision.
   {
     id: 1,
     title: "Solar Drop -40%",
@@ -206,6 +207,7 @@ const scenarios = [
     tone: "red",
     category: "Demand",
   },
+  { id: 10, title: "Multiple Events", description: "Solar drops 40% while electricity price rises 50%.", icon: BeakerIcon, tone: "red", category: "Combined" },
 ];
 
 function App() {
@@ -221,6 +223,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const pageHeading = useRef<HTMLHeadingElement>(null);
+  const scenarioResultPanel = useRef<HTMLDivElement>(null);
   const command = activePage === "Command Center";
   const assets = useResource<Assets>(
     "assets",
@@ -259,6 +262,54 @@ function App() {
     "actions",
     activePage === "AI Decisions",
   );
+  const alerts = useResource<{id: string; severity: string; message: string; timestamp: string}[]>("alerts", activePage === "Alerts");
+  const settings = useResource<{cost_weight: number; carbon_weight: number; battery_reserve_percent: number}>("settings", activePage === "Settings");
+  const [settingsDraft, setSettingsDraft] = useState({cost_weight: 1, carbon_weight: 1, battery_reserve_percent: 10});
+  const [settingsMessage, setSettingsMessage] = useState("");
+  const [savingSettings, setSavingSettings] = useState(false);
+  const settingsDirty = useRef(false);
+  const executionLock = useRef(false);
+  useEffect(() => { if (settings.data && !settingsDirty.current) setSettingsDraft(settings.data); }, [settings.data]);
+  useEffect(() => { if (activePage !== "Settings") settingsDirty.current = false; }, [activePage]);
+  const saveSettings = async () => {
+    setSavingSettings(true);
+    setSettingsMessage("");
+    try {
+      await axios.put("/api/settings", settingsDraft);
+      settingsDirty.current = false;
+      setSettingsMessage("Settings saved. They apply to the next optimization.");
+      window.dispatchEvent(new Event("resources-changed"));
+    } catch { setSettingsMessage("Settings could not be saved. Check the values and API connection."); }
+    finally { setSavingSettings(false); }
+  };
+  useEffect(() => {
+    if (!orchestratorResult && history.data?.length) {
+      const latest = history.data[0];
+      setOrchestratorResult({message: latest.event, decision: latest.details.decision,
+        explanation: latest.details.explanation, optimization: latest.details.optimization_result,
+        before: latest.details.before, after: latest.details.after});
+    }
+  }, [history.data, orchestratorResult]);
+  const showScenarioResult = () => {
+    window.requestAnimationFrame(() => scenarioResultPanel.current?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      block: "start",
+    }));
+  };
+  const resetSimulation = async () => {
+    if (executionLock.current) return;
+    executionLock.current = true;
+    setPendingScenarios(1);
+    showScenarioResult();
+    setActionError("");
+    try {
+      const response = await axios.post<DecisionResult>("/api/simulation/reset");
+      setOrchestratorResult(response.data);
+      await fetchState();
+      window.dispatchEvent(new Event("resources-changed"));
+    } catch { setActionError("Simulation reset failed. Check the API connection."); }
+    finally { executionLock.current = false; setPendingScenarios(0); }
+  };
   const latestGrid = grid.data?.[0];
   const latestMarket = market.data?.[0];
 
@@ -280,7 +331,7 @@ function App() {
   const fetchState = async (signal?: AbortSignal) => {
     try {
       const res = await axios.get<SystemState>(
-        "http://localhost:8000/api/state",
+        "/api/state",
         { signal },
       );
       setState(res.data);
@@ -290,35 +341,45 @@ function App() {
       if (axios.isCancel(error)) return;
       console.error("Error fetching state:", error);
       setStateError(
-        "System state is unavailable. Check that FastAPI is running on localhost:8000.",
+        "System state is unavailable. Check the backend connection and try again.",
       );
     }
   };
 
   const runOrchestrator = async () => {
+    if (executionLock.current) return;
+    executionLock.current = true;
     setLoading(true);
     setActionError("");
     try {
       const res = await axios.post<DecisionResult>(
-        "http://localhost:8000/api/orchestrator/run",
+        "/api/orchestrator/run",
       );
+      if (res.data.error) throw new Error(res.data.error);
       setOrchestratorResult(res.data);
+      window.dispatchEvent(new Event("resources-changed"));
     } catch (error) {
       console.error("Error running orchestrator:", error);
       setActionError("The agent request failed. No new decision was received.");
     }
     setLoading(false);
+    executionLock.current = false;
   };
 
   const runScenario = async (id: number) => {
+    if (executionLock.current) return;
+    executionLock.current = true;
     setPendingScenarios((value) => value + 1);
+    showScenarioResult();
     setActionError("");
     try {
       const res = await axios.post<DecisionResult>(
-        `http://localhost:8000/api/scenarios/run?scenario_id=${id}`,
+        `/api/scenarios/run?scenario_id=${id}`,
       );
+      if (res.data.error) throw new Error(res.data.error);
       setOrchestratorResult(res.data);
-      void fetchState();
+      await fetchState();
+      window.dispatchEvent(new Event("resources-changed"));
     } catch (error) {
       console.error("Error running scenario:", error);
       setActionError(
@@ -326,6 +387,7 @@ function App() {
       );
     } finally {
       setPendingScenarios((value) => value - 1);
+      executionLock.current = false;
     }
   };
 
@@ -459,7 +521,7 @@ function App() {
           </Empty>
         )
       )}
-      <p className="helper">1-hour API outlook · backend demo values</p>
+      <p className="helper">1-hour simulation outlook · current-state heuristic</p>
     </>
   );
   const records = (list: AuditRecord[] | null, compact = false) =>
@@ -493,7 +555,7 @@ function App() {
     ) : (
       <Empty title="No recorded decisions">
         Scenario audit records appear here when the backend returns them.
-        Standalone agent runs do not currently create audit records.
+        Agent runs and scenario runs are recorded.
       </Empty>
     );
 
@@ -582,7 +644,7 @@ function App() {
               {state ? " Last received values are shown." : ""}
             </p>
           )}
-          {actionError && (
+          {actionError && activePage !== "Scenario Simulator" && (
             <p className="notice notice-danger" role="alert">
               {actionError}
             </p>
@@ -705,7 +767,7 @@ function App() {
                     <button
                       className="primary-button"
                       onClick={runOrchestrator}
-                      disabled={loading}
+                      disabled={loading || pendingScenarios > 0}
                     >
                       {loading ? (
                         <ArrowPathIcon className="spin" />
@@ -1115,7 +1177,7 @@ function App() {
               </div>
               <div className="section-bar">
                 <span className="eyebrow">Select a scenario</span>
-                <span className="muted">9 existing execution controls</span>
+                <button className="primary-button" onClick={() => void resetSimulation()} disabled={pendingScenarios > 0 || loading}>Reset simulation</button>
               </div>
               <div className="scenario-grid">
                 {scenarios.map(
@@ -1123,6 +1185,7 @@ function App() {
                     <button
                       key={id}
                       onClick={() => runScenario(id)}
+                      disabled={pendingScenarios > 0 || loading}
                       className={`scenario-card scenario-${tone}`}
                     >
                       <div className="scenario-top">
@@ -1143,22 +1206,8 @@ function App() {
                   ),
                 )}
               </div>
-              <div className="scenario-unavailable">
-                <span className="scenario-index">10</span>
-                <div>
-                  <strong>Multiple simultaneous events</strong>
-                  <p>
-                    Backend-only scenario; no execution control exists in the
-                    original frontend.
-                  </p>
-                </div>
-                <Badge>Unavailable in UI</Badge>
-              </div>
-              <p className="helper">
-                Some backend scenarios currently record an event without
-                changing its corresponding telemetry. The returned decision is
-                shown as received.
-              </p>
+              <p className="helper">Scenarios change the simulation and accumulate. The result shows before/after values. A constrained system may correctly return INFEASIBLE.</p>
+              <div ref={scenarioResultPanel} className="scenario-result-panel" role="region" aria-label="Scenario result">
               <Panel
                 title="Simulation result"
                 eyebrow="Backend response"
@@ -1181,13 +1230,13 @@ function App() {
                     </p>
                   )}
                 </div>
-                <DecisionOutput result={orchestratorResult} />
+                {actionError && <p className="notice notice-danger" role="alert">{actionError}</p>}
+                {pendingScenarios === 0 && <DecisionOutput result={orchestratorResult} />}
                 <p className="helper">
-                  Results share the existing current-decision state.
-                  Before/after impact metrics and execution stage progress are
-                  not returned by this API.
+                  The recommendation uses the updated generation, demand, market price and asset availability. Reset simulation restores the starting conditions and keeps decision history.
                 </p>
               </Panel>
+              </div>
             </div>
           )}
 
@@ -1237,15 +1286,14 @@ function App() {
                   <DataList
                     rows={[
                       ["Solar / wind / demand", "Single 1-hour value"],
-                      ["Forecast timestamps", "Not supplied"],
+                      ["Forecast timestamps", forecasts.data ? "Source grid timestamp" : "Awaiting data"],
                       ["Price forecast", "Not supplied"],
                       ["Uncertainty intervals", "Not supplied"],
                       ["Selectable horizons", "Not implemented"],
                     ]}
                   />
                   <p className="helper">
-                    The backend currently returns fixed forecast values. These
-                    are not trained-model predictions or live weather forecasts.
+                    Forecasts are calculated from the current simulated generation and demand. They use a simple heuristic, not a trained model or external weather feed.
                   </p>
                 </Panel>
               </div>
@@ -1271,11 +1319,11 @@ function App() {
                     rows={[
                       ["Solver", "OR-Tools GLOP"],
                       ["Horizon", "Single interval"],
-                      ["Cost weight", "1.0"],
-                      ["Carbon weight", "1.0"],
+                      ["Cost weight", "Configured in Settings"],
+                      ["Carbon weight", "Configured in Settings"],
                       [
-                        "Curtailment / degradation / profit",
-                        "Default weights: 1.0",
+                        "Curtailment / degradation",
+                        "Curtailment and degradation: 1.0",
                       ],
                     ]}
                   />
@@ -1286,13 +1334,10 @@ function App() {
                     <li>Renewable availability</li>
                     <li>Battery charge and discharge bounds</li>
                     <li>Battery SOC / capacity headroom</li>
-                    <li>Grid export transmission bound</li>
+                    <li>Grid import and export transmission bounds</li>
                   </ul>
                   <p className="helper">
-                    Configuration is read-only. Reserve requirements, asset
-                    outages, import transmission limits, and market limits are
-                    not enforced by the current solver. No cost/carbon impact
-                    breakdown is returned.
+                    Battery reserves, efficiency and outages are enforced. Import and export cannot occur together. Adjust cost and carbon weights in Settings.
                   </p>
                 </Panel>
               </div>
@@ -1320,7 +1365,7 @@ function App() {
               <ResourceFeedback {...history} />
               <Panel
                 title="Decision timeline"
-                eyebrow="Latest 10 scenario audit records"
+                eyebrow="Latest 10 decision records"
                 trailing={<Badge>{history.data?.length ?? "—"} records</Badge>}
               >
                 {records(history.data)}
@@ -1341,21 +1386,20 @@ function App() {
                   label="Cost savings"
                   value={analytics.data?.cost_savings}
                   unit="$"
-                  caption="Backend demo aggregate"
+                  caption="Simulated recommendation aggregate"
                   icon={<ChartBarIcon />}
                 />
                 <Metric
                   label="Carbon reduction"
                   value={analytics.data?.carbon_reduction_tons}
                   unit="tons"
-                  caption="Backend demo aggregate"
+                  caption="Simulated recommendation aggregate"
                   tone="cyan"
                   icon={<CloudIcon />}
                 />
               </div>
               <p className="notice">
-                The analytics API returns fixed demo aggregates. No reporting
-                period, baseline, or calculation provenance is supplied.
+                Estimated impact across recorded feasible recommendations, compared with an all-grid baseline for each 15-minute interval. These figures are simulated estimates, not realized savings.
               </p>
               <div className="two-column">
                 <Panel title="Demand trend" eyebrow="Available grid history">
@@ -1405,14 +1449,13 @@ function App() {
           {activePage === "Alerts" && (
             <div className="two-column">
               <Panel title="Operational alerts" eyebrow="Monitoring coverage">
-                <Empty title="Alert feed not implemented" icon={<BellIcon />}>
-                  There is no alerts endpoint or resolution workflow in the
-                  existing API. An empty feed does not indicate a healthy grid.
-                </Empty>
-                <div className="notice notice-warning">
-                  Alert severity, timestamps, and acknowledgement are
-                  unavailable.
-                </div>
+                <ResourceFeedback {...alerts} />
+                {alerts.data?.length ? alerts.data.map(alert => (
+                  <div key={alert.id} className="notice notice-warning">
+                    <Badge tone={alert.severity === "critical" ? "red" : "amber"}>{alert.severity}</Badge>
+                    <p>{alert.message}</p><small>{timestamp(alert.timestamp)}</small>
+                  </div>
+                )) : !alerts.loading && !alerts.error && <Empty title="No active simulation alerts" icon={<BellIcon />}>No storm, battery outage or dispatch constraint is currently flagged.</Empty>}
               </Panel>
               <Panel title="Environmental context" eyebrow="Weather API">
                 <ResourceFeedback {...weather} />
@@ -1427,12 +1470,11 @@ function App() {
                       "Wind speed",
                       `${number(weather.data?.wind_speed_ms)} m/s`,
                     ],
-                    ["Storm alerts", "Not supplied"],
+                    ["Storm alerts", weather.data?.status === "storm warning" ? "Active" : "None"],
                   ]}
                 />
                 <p className="helper">
-                  Fixed backend demonstration data; not a live weather or
-                  warning feed.
+                  Simulated weather conditions updated by weather scenarios; no external weather feed is connected.
                 </p>
               </Panel>
             </div>
@@ -1447,7 +1489,7 @@ function App() {
                 >
                   <DataList
                     rows={[
-                      ["API origin", "http://localhost:8000"],
+                      ["API connection", "Same-origin /api proxy"],
                       ["System state endpoint", "/api/state"],
                       ["Refresh interval", "15 seconds"],
                       [
@@ -1461,8 +1503,7 @@ function App() {
                     ]}
                   />
                   <p className="helper">
-                    Existing connection settings are displayed read-only.
-                    Configuration persistence is not implemented.
+                    The dashboard refreshes every fifteen seconds. Successful scenario runs immediately refresh system values and page resources.
                   </p>
                 </Panel>
                 <Panel title="Workspace & presentation" eyebrow="Environment">
@@ -1484,14 +1525,23 @@ function App() {
                 title="Settings availability"
                 eyebrow="Configuration scope"
               >
-                <Empty
-                  title="No editable settings API"
-                  icon={<Cog6ToothIcon />}
-                >
-                  No configuration form, save workflow, or persistence contract
-                  exists in the original application. Connection and workspace
-                  details are available above.
-                </Empty>
+                <ResourceFeedback {...settings} />
+                <form className="settings-form" onSubmit={event => { event.preventDefault(); void saveSettings(); }}>
+                  {([
+                    ["cost_weight", "Cost weight", 100],
+                    ["carbon_weight", "Carbon weight", 100],
+                    ["battery_reserve_percent", "Battery reserve (%)", 100],
+                  ] as const).map(([key, label, max]) => (
+                    <label key={key}>{label}
+                      <input type="number" min="0" max={max} step="0.1" required value={settingsDraft[key]}
+                        onChange={event => { settingsDirty.current = true; setSettingsDraft({...settingsDraft, [key]: Number(event.target.value)}); }} />
+                    </label>
+                  ))}
+                  <button className="primary-button" type="submit" disabled={savingSettings || settings.loading || !!settings.error}>
+                    {savingSettings ? "Saving..." : "Save settings"}
+                  </button>
+                  <p role="status">{settingsMessage}</p>
+                </form>
               </Panel>
             </div>
           )}

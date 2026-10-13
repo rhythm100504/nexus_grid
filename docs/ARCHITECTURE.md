@@ -1,16 +1,15 @@
-# Architecture
+# Implemented architecture
 
-Data Sources -> Kafka / Ingestion -> Data Validation -> Current State Store -> Forecasting + Risk + Constraints -> Agent Orchestrator (LangGraph) -> Specialist Agents -> Optimization Engine (OR-Tools) -> Constraint / Safety Validation -> Scenario Simulation -> Decision + Explanation -> Action Recommendation / Simulated Execution -> Monitoring -> Re-planning
+React / TypeScript dashboard -> same-origin /api proxy -> FastAPI -> SQLAlchemy simulation database.
 
-## Technology Stack
-- **Frontend**: React + TypeScript + Tailwind CSS + Apache ECharts
-- **Backend**: Python + FastAPI + Pydantic + SQLAlchemy
-- **Agent orchestration**: LangGraph
-- **LLM**: Provider abstraction (OpenAI/Anthropic/Google Gemini)
-- **Optimization**: Google OR-Tools
-- **Forecasting**: XGBoost / LightGBM
-- **Database**: PostgreSQL
-- **State/cache**: Redis
-- **Event streaming**: Apache Kafka
-- **Simulation**: Python
-- **Containers**: Docker + Docker Compose
+Agent/scenario request -> persistent observed generation, demand, price, battery status and limits -> LangGraph -> OR-Tools -> constraint validation -> simulated impact estimate -> recommendation and solver-based explanation -> audit history.
+
+LangGraph stages: analyze situation, check forecasts, check constraints, generate options, optimize, validate, simulate, decide and explain. Each invocation is operator-triggered; there is no background re-planning loop.
+
+The numerical solver uses current asset capacities, generation factors, battery availability, efficiency and reserves, transmission limits, market price and saved objective weights. It solves a 15-minute interval. Enumerated modes prevent simultaneous grid import/export and simultaneous battery charge/discharge.
+
+Scenario Simulator exposes ten working event controls and a reset control. Scenarios persist simulated changes; reset appends restored-state records without deleting history. Frontend polling runs every 15 real seconds; scenario timestamps advance by 15 simulated minutes.
+
+Weather is simulated. Forecasts use current-state heuristics. Analytics estimates recommendation impacts against an all-grid baseline and does not measure realized savings. Alerts derive from storm status, battery outages, transmission constraints and infeasible results.
+
+Local data uses SQLite; PostgreSQL is available in the Docker configuration. Redis, Kafka, physical telemetry and trained forecasting are not integrated into this runtime.

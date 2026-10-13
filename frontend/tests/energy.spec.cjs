@@ -232,15 +232,15 @@ test("orchestrator POST, loading state, real decision and optimization remain co
   expect(errors).toEqual([]);
 });
 
-test("all nine existing scenario controls invoke real backend and update dashboard and audit", async ({
+test("all ten scenario controls invoke real backend and update dashboard and audit", async ({
   page,
   request,
 }) => {
   const errors = trackErrors(page);
   await start(page);
   await navigate(page, "Scenario Simulator");
-  await expect(page.locator(".scenario-card")).toHaveCount(9);
-  for (let id = 1; id <= 9; id++) {
+  await expect(page.locator(".scenario-card")).toHaveCount(10);
+  for (let id = 1; id <= 10; id++) {
     const response = page.waitForResponse((r) =>
       r.url().includes(`/api/scenarios/run?scenario_id=${id}`),
     );
@@ -311,7 +311,7 @@ test("15-second polling continues across navigation and refresh", async ({
   ).toBeVisible();
   await expect(page.getByText("API connected", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("Ready to reason", { exact: true }),
+    page.getByTestId("decision-output").first(),
   ).toBeVisible();
 });
 

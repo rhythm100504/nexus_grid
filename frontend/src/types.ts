@@ -46,6 +46,7 @@ export interface Forecasts {
   solar_1hr: number;
   wind_1hr: number;
   demand_1hr: number;
+  timestamp?: string;
 }
 export interface Optimization {
   status?: string;
@@ -67,6 +68,8 @@ export interface DecisionResult {
   decision?: { action?: string; details?: Optimization };
   explanation?: string;
   optimization?: Optimization;
+  before?: SystemState;
+  after?: SystemState;
 }
 export interface AuditRecord {
   id: number;
@@ -77,6 +80,8 @@ export interface AuditRecord {
     decision?: DecisionResult["decision"];
     explanation?: string;
     optimization_result?: Optimization;
+    before?: SystemState;
+    after?: SystemState;
   };
 }
 export interface Weather {

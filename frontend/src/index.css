@@ -1696,3 +1696,11 @@ pre {
     scroll-behavior: auto !important;
   }
 }
+/* Simulation controls and persisted optimization preferences. */
+.scenario-card:disabled { opacity: .55; cursor: wait; }
+.scenario-impact { margin: 16px 0; }
+.settings-form { display: grid; gap: 16px; max-width: 440px; }
+.settings-form label { display: grid; gap: 8px; }
+.settings-form input { background: #111f2a; border: 1px solid #496171; border-radius: 8px; padding: 12px; color: #f4f8fa; font: inherit; width: 100%; }
+.settings-form input:focus { outline: 2px solid #40cbb0; outline-offset: 2px; }
+.scenario-result-panel { scroll-margin-top: 24px; }
