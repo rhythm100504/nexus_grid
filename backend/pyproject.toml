@@ -1,2 +1,19 @@
+[project]
+name = "nexus-grid-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "sqlalchemy",
+    "psycopg2-binary",
+    "ortools",
+    "langgraph",
+    "langchain-core",
+    "langchain-google-genai",
+    "python-dotenv",
+]
+
 [tool.vercel]
 entrypoint = "app.api.main:app"
